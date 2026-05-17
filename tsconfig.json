@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "types": ["node", "express", "multer"]
+  }
+}
+
+// {
+//   "compilerOptions": {
+//     "module": "CommonJS",
+//     "moduleResolution": "node",
+//     "target": "ES2023",
+//     "outDir": "./dist",
+//     "esModuleInterop": true,
+//     "allowSyntheticDefaultImports": true,
+//     "experimentalDecorators": true,
+//     "emitDecoratorMetadata": true,
+//     "strict": true,
+//     "baseUrl": "./",
+//     "paths": { "@/*": ["src/*"] }
+//   }
+// }

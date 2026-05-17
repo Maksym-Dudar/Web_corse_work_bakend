@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  otp       String?
+  expireOtp DateTime? @map("expire_otp")
+  firstName String    @map("first_name")
+  lastName  String?   @map("last_name")
+  avatar    String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  Address   Address[]
+  comments  Comment[]
+  orders    Order[]
+}
+
+model Product {
+  id                Int          @id @default(autoincrement())
+  productGroupId    Int          @map("product_group_id")
+  isNew             Boolean      @map("is_new")
+  offerExpires      DateTime?    @map("offer_expires")
+  measurements      String
+  price             Decimal      @db.Decimal(10, 2)
+  sale              Decimal      @db.Decimal(5, 2)
+  rating            Int
+  reviews           Int
+  quantityWarehouse Int          @map("quantity_warehouse")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime?    @updatedAt @map("updated_at")
+  color             String
+  description       String
+  image             String[]
+  category          Category[]
+  comment           Comment[]
+  orderItem         OrderItem[]
+  productGroup      ProductGroup @relation(fields: [productGroupId], references: [id])
+}
+
+model ProductGroup {
+  id      Int       @id @default(autoincrement())
+  title   String
+  product Product[]
+}
+
+model Address {
+  id             Int     @id @default(autoincrement())
+  userId         Int     @map("user_id")
+  firstName      String  @map("first_name")
+  lastName       String  @map("last_name")
+  phoneNumber    String  @map("phone_number")
+  email          String  @map("email")
+  country        String  @map("country")
+  state          String  @map("state")
+  city           String  @map("city")
+  street         String  @map("street")
+  buildingNumber String  @map("building_number")
+  zipCode        String  @map("zip_code")
+  user           User    @relation(fields: [userId], references: [id])
+  orders         Order[]
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  userId    Int         @map("user_id")
+  addressId Int?        @map("address_id")
+  createdAt DateTime    @default(now()) @map("created_at")
+  status    OrderStatus @map("status")
+  subtotal  Decimal     @db.Decimal(10, 2)
+  total     Decimal     @db.Decimal(10, 2)
+  firstName String?     @map("first_name")
+  lastName  String?     @map("last_name")
+  email     String?     @map("email")
+
+  shippingMethodId Int
+  orderItem        OrderItem[]
+
+  shippingMethod ShippingMethod @relation(fields: [shippingMethodId], references: [id])
+  address        Address?       @relation(fields: [addressId], references: [id])
+  user           User           @relation(fields: [userId], references: [id])
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int     @map("order_id")
+  productId Int     @map("product_id")
+  quantity  Int     @map("quantity")
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  productId Int      @map("product_id")
+  rating    Int
+  text      String
+  createdAt DateTime @default(now()) @map("created_at")
+  product   Product  @relation(fields: [productId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model ShippingMethod {
+  id       Int     @id @default(autoincrement())
+  label    String
+  method   String  @unique @map("method")
+  percent  Decimal @db.Decimal(5, 2)
+  fixedFee Decimal @map("fixed_fee") @db.Decimal(10, 2)
+
+  orders Order[]
+}
+
+enum Category {
+  LIVING_ROOM @map("living_room")
+  BEDROOM     @map("bedroom")
+  KITCHEN     @map("kitchen")
+  BATHROOM    @map("bathroom")
+  OFFICE      @map("office")
+}
+
+enum OrderStatus {
+  PENDING    @map("pending")
+  CONFIRMED  @map("confirmed")
+  PROCESSING @map("processing")
+  SHIPPED    @map("shipped")
+  DELIVERED  @map("delivered")
+  COMPLETED  @map("completed")
+  CANCELLED  @map("cancelled")
+  RETURNED   @map("returned")
+  FAILED     @map("failed")
+}

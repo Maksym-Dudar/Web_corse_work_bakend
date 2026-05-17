@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build && tsc-alias",
+    "build": "prisma generate && nest build && tsc-alias",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node -r tsconfig-paths/register dist/src/main.js",
     "start:dev": "nest start --watch -r tsconfig-paths/register",

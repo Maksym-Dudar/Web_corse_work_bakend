@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import { join } from 'path';
 
 async function bootstrap() {
+    try {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
     new ValidationPipe({
@@ -21,13 +22,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // app.use((req, res, next) => {
-  //   if (!req.secure) {
-  //     return res.redirect('https://' + req.headers.host + req.url);
-  //   }
-  //   next();
-  // });
-
   app.use(cookieParser());
 
   app.use('/webhook/stripe', express.raw({ type: 'application/json' }));
@@ -36,5 +30,10 @@ async function bootstrap() {
 
   const url = await app.getUrl();
   console.log(`Server running on ${url}`);
+        } catch (err) {
+
+    console.error(err);
+
+  }
 }
 bootstrap();

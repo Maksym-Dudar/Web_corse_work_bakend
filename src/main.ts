@@ -7,12 +7,7 @@ import cookieParser from 'cookie-parser';
 import { join } from 'path';
 
 async function bootstrap() {
-  const httpsOptions = {
-    key: fs.readFileSync('cert.key'),
-    cert: fs.readFileSync('cert.crt'),
-  };
-
-  const app = await NestFactory.create(AppModule, { httpsOptions });
+  const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,

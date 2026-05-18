@@ -1,14 +1,14 @@
-import { Worker } from 'bullmq';
+import { Worker } from "bullmq";
 
-const worker = new Worker(
-  'email',
-  async (job) => {
+void new Worker(
+  "email",
+  async () => {
     // if (job.name === 'send-welcome') {
     // }
   },
   {
     connection: {
-      host: 'localhost',
+      host: "localhost",
       port: 4200,
     },
   },

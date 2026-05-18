@@ -1,7 +1,7 @@
-import { IsOptional, IsEnum, IsString, IsNumber } from 'class-validator';
-import { Type, Transform } from 'class-transformer';
-import { Category } from '@prisma/client';
-import { Sorts } from '@/common/enums/sorts.enum';
+import { IsOptional, IsEnum, IsNumber, IsArray, IsInt } from "class-validator";
+import { Type, Transform } from "class-transformer";
+import { Category } from "@prisma/client";
+import { Sorts } from "@/common/enums/sorts.enum";
 
 export class FindManyShopDto {
   @IsNumber()
@@ -9,8 +9,8 @@ export class FindManyShopDto {
   take!: number;
 
   @IsOptional()
-  @IsEnum([...Object.values(Category), 'ALL'])
-  category?: Category | 'ALL';
+  @IsEnum([...Object.values(Category), "ALL"])
+  category?: Category | "ALL";
 
   @IsOptional()
   @IsNumber()
@@ -27,8 +27,13 @@ export class FindManyShopDto {
   sort?: Sorts;
 
   @IsOptional()
-  @IsString()
-  @Transform(({ value }) => value?.split(',').map(Number))
+  @IsArray()
+  @IsInt({ each: true })
+  @Transform(({ value }) =>
+    Array.isArray(value)
+      ? value.map(Number)
+      : String(value).split(",").filter(Boolean).map(Number),
+  )
   groupId?: number[];
 
   @IsOptional()

@@ -1,6 +1,6 @@
-import { PrismaService } from '@/database/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { PrismaService } from "@/database/prisma/prisma.service";
+import { Injectable } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class ProductRepository {
@@ -28,12 +28,13 @@ export class ProductRepository {
       },
     });
   }
-  async findManyPriseCards(ids: number[]) {
+  async findManyPriceCards(ids: number[]) {
     return await this.prisma.product.findMany({
       select: {
         id: true,
         price: true,
         sale: true,
+        quantityWarehouse: true,
       },
       where: {
         id: {

@@ -1,5 +1,5 @@
 class DirectoryConfig {
-  PUBLIC = '/public';
+  PUBLIC = "/public";
   USER = `${this.PUBLIC}/user`;
   AVATAR = `${this.USER}/avatar`;
   PRODUCT = `${this.PUBLIC}/product`;

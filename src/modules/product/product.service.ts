@@ -2,29 +2,32 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { ProductRepository } from './product.repository';
-import { CreateProductDto } from './dto/create-product.dto';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { Sorts } from '@/common/enums/sorts.enum';
-import { mapSortToPrisma } from '@/common/utils/map-sort-to-prisma';
-import { DIRECTORY } from '@/configs/directory.config';
-import { Category, Prisma } from '@prisma/client';
+} from "@nestjs/common";
+import { ProductRepository } from "./product.repository";
+import { CreateProductDto } from "./dto/create-product.dto";
+import * as fs from "fs/promises";
+import * as path from "path";
+import { Sorts } from "@/common/enums/sorts.enum";
+import { mapSortToPrisma } from "@/common/utils/map-sort-to-prisma";
+import { DIRECTORY } from "@/configs/directory.config";
+import { Category, Prisma } from "@prisma/client";
 
 const RAW_IMAGE_BASE_URL =
-  process.env.IMAGE_BASE_URL ?? 'https://localhost:4200';
-const IMAGE_BASE_URL = RAW_IMAGE_BASE_URL.endsWith('/')
+  process.env.IMAGE_BASE_URL ?? "https://localhost:4200";
+const IMAGE_BASE_URL = RAW_IMAGE_BASE_URL.endsWith("/")
   ? RAW_IMAGE_BASE_URL.slice(0, -1)
   : RAW_IMAGE_BASE_URL;
 
-const buildImageUrl = (path: string) => {
-  if (path.startsWith('http://') || path.startsWith('https://')) {
-    return path;
+const buildImageUrl = (imagePath?: string | null) => {
+  if (!imagePath) {
+    return null;
   }
-  return path[0] === '/'
-    ? `${IMAGE_BASE_URL}${path}`
-    : `${IMAGE_BASE_URL}/${path}`;
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    return imagePath;
+  }
+  return imagePath[0] === "/"
+    ? `${IMAGE_BASE_URL}${imagePath}`
+    : `${IMAGE_BASE_URL}/${imagePath}`;
 };
 
 @Injectable()
@@ -35,7 +38,7 @@ export class ProductService {
     skip: number;
     take: number;
     sort?: Sorts;
-    category?: Category | 'ALL';
+    category?: Category | "ALL";
     maxPrice?: number;
     minPrice?: number;
     groupId?: number[];
@@ -45,15 +48,15 @@ export class ProductService {
       take,
       maxPrice,
       minPrice = 0,
-      category = 'ALL',
+      category = "ALL",
       sort = Sorts.newest,
       groupId,
     } = params;
 
-    const where: any = {
+    const where: Prisma.ProductWhereInput = {
       price: { gte: minPrice, ...(maxPrice ? { lte: maxPrice } : {}) },
       ...(groupId ? { productGroupId: { in: groupId } } : {}),
-      ...(category !== 'ALL' ? { category: { hasSome: [category] } } : {}),
+      ...(category !== "ALL" ? { category: { hasSome: [category] } } : {}),
     };
     const orderBy = mapSortToPrisma(sort);
 
@@ -83,7 +86,6 @@ export class ProductService {
   }
 
   async findManyCart(ids: number[]) {
-    console.log(ids);
     const data = await this.productRepo.findManyCartCards(ids);
     return data.map((val) => ({
       ...val,
@@ -105,10 +107,10 @@ export class ProductService {
     if (!files || files.length == 0) {
       throw new BadRequestException("Files don't found");
     }
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
     for (const file of files) {
       if (!allowedMimeTypes.includes(file.mimetype)) {
-        throw new BadRequestException('Incorrect image format');
+        throw new BadRequestException("Incorrect image format");
       }
     }
 
@@ -139,7 +141,7 @@ export class ProductService {
       );
       await fs.mkdir(uploadDir, { recursive: true });
       const extension = path.extname(file.originalname).toLowerCase();
-      const safeExtension = extension.replace(/[^a-z0-9.]/gi, '');
+      const safeExtension = extension.replace(/[^a-z0-9.]/gi, "");
       const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}${safeExtension}`;
       const filePath = path.join(uploadDir, fileName);
 
@@ -159,7 +161,7 @@ export class ProductService {
   async findDetail(id: number) {
     const details = await this.productRepo.findDetail(id);
 
-    if (!details) throw new NotFoundException('Product not found');
+    if (!details) throw new NotFoundException("Product not found");
 
     const { productGroup, image, ...res } = details;
     const { title, product } = productGroup;

@@ -1,9 +1,13 @@
-import { IsArray, IsNumber } from 'class-validator';
-import { Type, Transform } from 'class-transformer';
+import { IsArray, IsInt } from "class-validator";
+import { Transform } from "class-transformer";
 
 export class FindManyWishlistDto {
   @IsArray()
-  @IsNumber({}, { each: true })
-  @Transform(({ value }) => value?.split(',').map(Number))
+  @IsInt({ each: true })
+  @Transform(({ value }) =>
+    Array.isArray(value)
+      ? value.map(Number)
+      : String(value).split(",").filter(Boolean).map(Number),
+  )
   ids!: number[];
 }

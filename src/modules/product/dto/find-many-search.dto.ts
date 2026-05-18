@@ -1,6 +1,11 @@
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from "class-validator";
 
 export class FindManySearchDto {
+  @IsOptional()
   @IsString()
-  world!: string;
+  word?: string;
+
+  @IsOptional()
+  @IsString()
+  world?: string;
 }

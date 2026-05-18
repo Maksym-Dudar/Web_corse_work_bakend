@@ -1,25 +1,30 @@
-import { Controller, Post, Req, Headers, HttpCode } from '@nestjs/common';
-import type { Request } from 'express';
-import { StripeService } from '@/integrations/stripe/stripe.service';
-import { OrderService } from '@/modules/order/order.service';
+import { Controller, Post, Req, Headers, HttpCode } from "@nestjs/common";
+import type { Request } from "express";
+import { StripeService } from "@/integrations/stripe/stripe.service";
+import { OrderService } from "@/modules/order/order.service";
 
-@Controller('webhook')
+type RawBodyRequest = Request & { rawBody?: Buffer };
+
+@Controller("webhook")
 export class PaymentWebhookController {
   constructor(
     private stripeService: StripeService,
     private orderService: OrderService,
   ) {}
 
-  @Post('stripe')
+  @Post("stripe")
   @HttpCode(200)
   async handleStripeWebhook(
-    @Req() req: Request,
-    @Headers('stripe-signature') signature: string,
+    @Req() req: RawBodyRequest,
+    @Headers("stripe-signature") signature: string,
   ) {
-    const event = this.stripeService.constructWebhookEvent(req.body, signature);
+    const event = this.stripeService.constructWebhookEvent(
+      req.rawBody ?? Buffer.from(JSON.stringify(req.body)),
+      signature,
+    );
 
     switch (event.type) {
-      case 'payment_intent.succeeded': {
+      case "payment_intent.succeeded": {
         const paymentIntent = event.data.object;
         const orderId = +paymentIntent.metadata.orderId;
 
@@ -27,7 +32,7 @@ export class PaymentWebhookController {
         break;
       }
 
-      case 'payment_intent.payment_failed': {
+      case "payment_intent.payment_failed": {
         const paymentIntent = event.data.object;
         const orderId = +paymentIntent.metadata.orderId;
 

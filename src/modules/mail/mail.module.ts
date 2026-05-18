@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { MailService } from './mail.service';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
+import { Module } from "@nestjs/common";
+import { MailerModule } from "@nestjs-modules/mailer";
+import { MailService } from "./mail.service";
+import { HandlebarsAdapter } from "@nestjs-modules/mailer/adapters/handlebars.adapter";
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.ad
         from: '"No Reply" <noreply@example.com>',
       },
       template: {
-        dir: __dirname + '/templates',
+        dir: __dirname + "/templates",
         adapter: new HandlebarsAdapter(),
         options: { strict: true },
       },

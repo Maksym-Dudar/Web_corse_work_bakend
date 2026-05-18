@@ -3,13 +3,16 @@ import {
   ConflictException,
   Injectable,
   UnauthorizedException,
-} from '@nestjs/common';
-import { UserRepository } from '../user/user.repository';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import * as otpGenerator from 'otp-generator';
-import { MailService } from '../mail/mail.service';
-import { AccessTokenPayload } from './types.js';
+} from "@nestjs/common";
+import { UserRepository } from "../user/user.repository";
+import { JwtService } from "@nestjs/jwt";
+import * as bcrypt from "bcrypt";
+import * as otpGenerator from "otp-generator";
+import { MailService } from "../mail/mail.service";
+import { AccessTokenPayload } from "./types.js";
+
+const OTP_LENGTH = 6;
+const OTP_TTL_MS = 10 * 60 * 1000;
 
 @Injectable()
 export class AuthService {
@@ -23,13 +26,13 @@ export class AuthService {
     const user = await this.userRepo.findByEmailAllData(email);
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
 
     const payload: AccessTokenPayload = {
@@ -44,7 +47,7 @@ export class AuthService {
     const existingUser = await this.userRepo.findByEmail(email);
 
     if (existingUser) {
-      throw new ConflictException('User already exists');
+      throw new ConflictException("User already exists");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -60,19 +63,23 @@ export class AuthService {
   }
 
   async generateOtp(email: string) {
-    const otp = otpGenerator.generate(length, {
+    const user = await this.userRepo.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException("Invalid credentials");
+    }
+
+    const otp = otpGenerator.generate(OTP_LENGTH, {
       digits: true,
       upperCaseAlphabets: false,
       lowerCaseAlphabets: false,
       specialChars: false,
     });
-    const user = this.userRepo.update(email, {
+
+    await this.userRepo.update(email, {
       otp,
-      expireOtp: new Date(Date.now() + 604800),
+      expireOtp: new Date(Date.now() + OTP_TTL_MS),
     });
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+
     await this.mailService.sendVerification(email, otp);
     return;
   }
@@ -80,40 +87,55 @@ export class AuthService {
   async resetPasswordOtp(email: string, password: string, otp: string) {
     const user = await this.userRepo.findByEmailAllData(email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
     if (!user.expireOtp || user.expireOtp < new Date(Date.now())) {
-      throw new BadRequestException('Otp code is not changed');
+      throw new BadRequestException("Otp code is not changed");
     }
     if (user.otp != otp) {
-      throw new BadRequestException('Otp code incorrect');
+      throw new BadRequestException("Otp code incorrect");
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     return this.userRepo.update(email, {
       password: hashedPassword,
+      otp: null,
+      expireOtp: null,
     });
   }
 
   async verifyToken(token: string) {
-    const payload = this.jwtService.verify<AccessTokenPayload>(token);
+    let payload: AccessTokenPayload;
+    try {
+      payload = this.jwtService.verify<AccessTokenPayload>(token);
+    } catch {
+      throw new UnauthorizedException("Unauthorized user");
+    }
+
     if (!payload) {
-      throw new UnauthorizedException('Unauthorized user');
+      throw new UnauthorizedException("Unauthorized user");
     }
     const user = await this.userRepo.findByEmail(payload.email);
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException("User not found");
     }
     return user;
   }
 
-  async changePassword(email, oldPassword, newPassword) {
+  async changePassword(
+    email: string,
+    oldPassword: string,
+    newPassword: string,
+  ) {
     const user = await this.userRepo.findByEmailAllData(email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
-    const hashedOldPassword = await bcrypt.hash(oldPassword, 10);
-    if (user.password != hashedOldPassword) {
-      throw new BadRequestException('Incorrect password');
+    const isOldPasswordCorrect = await bcrypt.compare(
+      oldPassword,
+      user.password,
+    );
+    if (!isOldPasswordCorrect) {
+      throw new BadRequestException("Incorrect password");
     }
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     return this.userRepo.update(email, {

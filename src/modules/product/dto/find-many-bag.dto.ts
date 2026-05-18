@@ -1,11 +1,13 @@
-import { IsArray, IsInt } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsArray, IsInt } from "class-validator";
+import { Transform } from "class-transformer";
 
 export class FindManyBagDto {
   @IsArray()
   @IsInt({ each: true })
   @Transform(({ value }) =>
-    typeof value === 'string' ? value.split(',').map(Number) : value,
+    Array.isArray(value)
+      ? value.map(Number)
+      : String(value).split(",").filter(Boolean).map(Number),
   )
   ids!: number[];
 }

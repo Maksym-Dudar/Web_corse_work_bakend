@@ -1,11 +1,11 @@
-import { Queue } from 'bullmq';
-import { Injectable } from '@nestjs/common';
+import { Queue } from "bullmq";
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class EmailQueue {
-  queue = new Queue('email', {
+  queue = new Queue("email", {
     connection: {
-      host: 'localhost',
+      host: "localhost",
       port: 4200,
     },
   });

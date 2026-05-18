@@ -1,5 +1,5 @@
-import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable } from '@nestjs/common';
+import { MailerService } from "@nestjs-modules/mailer";
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class MailService {
@@ -8,8 +8,8 @@ export class MailService {
   async sendVerification(email: string, otp: string) {
     await this.mailerService.sendMail({
       to: email,
-      subject: 'Verify your email',
-      template: 'verification',
+      subject: "Verify your email",
+      template: "verification",
       context: { otp },
     });
     return;

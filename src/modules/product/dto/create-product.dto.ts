@@ -6,9 +6,9 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-import { Category } from '@prisma/client';
+} from "class-validator";
+import { Type } from "class-transformer";
+import { Category } from "@prisma/client";
 
 export class CreateProductDto {
   @IsString()
@@ -32,7 +32,7 @@ export class CreateProductDto {
   isNew!: boolean;
 
   @IsArray()
-  @IsEnum(Category, { each: true, message: 'Category is incorrect' })
+  @IsEnum(Category, { each: true, message: "Category is incorrect" })
   @Type(() => String)
   category!: Category[];
 

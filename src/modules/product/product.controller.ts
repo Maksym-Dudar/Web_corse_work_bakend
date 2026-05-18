@@ -7,59 +7,64 @@ import {
   Query,
   UploadedFiles,
   UseInterceptors,
-} from '@nestjs/common';
-import { ProductService } from './product.service';
-import { FindManyShopDto } from './dto/find-many-shop.dto';
-import { FindManySearchDto } from './dto/find-many-search.dto';
-import { FindManyBagDto } from './dto/find-many-bag.dto';
-import { FindManyWishlistDto } from './dto/find-many-wishlist.dto';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { CreateProductDto } from './dto/create-product.dto';
-import { FindDetailsDto } from './dto/find-details.dto';
+} from "@nestjs/common";
+import { ProductService } from "./product.service";
+import { FindManyShopDto } from "./dto/find-many-shop.dto";
+import { FindManySearchDto } from "./dto/find-many-search.dto";
+import { FindManyBagDto } from "./dto/find-many-bag.dto";
+import { FindManyWishlistDto } from "./dto/find-many-wishlist.dto";
+import { FilesInterceptor } from "@nestjs/platform-express";
+import { CreateProductDto } from "./dto/create-product.dto";
+import { FindDetailsDto } from "./dto/find-details.dto";
 
-@Controller('products')
+@Controller("products")
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor('images'))
+  @UseInterceptors(FilesInterceptor("images"))
   createProduct(
     @UploadedFiles() images: Express.Multer.File[],
     @Body() body: CreateProductDto,
   ) {
     if (!images || !Array.isArray(images))
-      throw new BadRequestException('Images incorect');
+      throw new BadRequestException("Images incorect");
 
     return this.productService.create(body, images);
   }
 
-  @Get('cards')
+  @Get("cards")
   findManyShop(@Query() query: FindManyShopDto) {
     const { take, page = 1, ...rest } = query;
     const skip = (page - 1) * take;
     return this.productService.findManyShop({ skip, take: take, ...rest });
   }
 
-  @Get('search')
+  @Get("search")
   findManySearch(@Query() query: FindManySearchDto) {
-    return this.productService.findManySearch(query.world);
+    const search = query.word ?? query.world;
+    if (!search) {
+      throw new BadRequestException("Search query is required");
+    }
+
+    return this.productService.findManySearch(search);
   }
 
-  @Get('bag')
+  @Get("bag")
   findManyCart(@Query() query: FindManyBagDto) {
     return this.productService.findManyCart(query.ids);
   }
-  @Get('wishlist')
+  @Get("wishlist")
   findManyWishlist(@Query() query: FindManyWishlistDto) {
-    return this.productService.findManyCart(query.ids);
+    return this.productService.findManyWishlist(query.ids);
   }
 
-  @Get('group')
+  @Get("group")
   findManyGroup() {
     return this.productService.findManyGroup();
   }
 
-  @Get('details')
+  @Get("details")
   findDetail(@Query() query: FindDetailsDto) {
     return this.productService.findDetail(query.id);
   }

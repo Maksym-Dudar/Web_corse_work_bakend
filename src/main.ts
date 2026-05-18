@@ -1,10 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import * as fs from 'fs';
 import * as express from 'express';
 import cookieParser from 'cookie-parser';
-import { join } from 'path';
 
 async function bootstrap() {
     try {
@@ -24,7 +22,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  app.use('/webhook/stripe', express.raw({ type: 'application/json' }));
+  // app.use('/webhook/stripe', express.raw({ type: 'application/json' }));
 
   await app.listen(process.env.PORT!, '0.0.0.0');
 

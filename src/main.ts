@@ -4,6 +4,7 @@ import { ValidationPipe } from "@nestjs/common";
 import cookieParser from "cookie-parser";
 import * as express from 'express';
 import { join } from 'path';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   try {
@@ -22,8 +23,16 @@ async function bootstrap() {
     });
 
     app.use(cookieParser());
-
+    
     app.use('/public', express.static(join(process.cwd(), 'public')));
+
+    app.use(
+    '/webhook/stripe',
+    bodyParser.raw({ type: 'application/json' }),
+
+  );
+
+  app.use(bodyParser.json());
 
     await app.listen(process.env.PORT ?? 3000, "0.0.0.0");
 

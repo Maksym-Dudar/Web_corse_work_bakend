@@ -25,7 +25,7 @@ return this.stripeService.createPaymentIntent({
 			amount: Number(order.total) * 100,
 			currency: "usd",
 			metadata: {
-				orderId: order.id,
+  orderId: order.id.toString(),
 			},
 		});
   }

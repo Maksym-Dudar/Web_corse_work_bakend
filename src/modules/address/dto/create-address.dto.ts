@@ -1,33 +1,27 @@
-import { IsString, IsEmail } from "class-validator";
+import { IsString, IsNumber, IsEmail } from 'class-validator';
 
 export class CreateAddressDto {
-  @IsString()
-  firstName!: string;
+	@IsString()
+	name!: string;
 
-  @IsString()
-  lastName!: string;
+	@IsString()
+	phoneNumber!: string;
 
-  @IsString()
-  phoneNumber!: string;
+	@IsString()
+	country!: string;
 
-  @IsEmail()
-  email!: string;
+	@IsString()
+	state!: string;
 
-  @IsString()
-  country!: string;
+	@IsString()
+	city!: string;
 
-  @IsString()
-  state!: string;
+	@IsString()
+	street!: string;
 
-  @IsString()
-  city!: string;
+	@IsString()
+	buildingNumber!: string;
 
-  @IsString()
-  street!: string;
-
-  @IsString()
-  buildingNumber!: string;
-
-  @IsString()
-  zipCode!: string;
+	@IsString()
+	zipCode!: string;
 }

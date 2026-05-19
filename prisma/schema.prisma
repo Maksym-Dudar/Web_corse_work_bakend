@@ -53,6 +53,7 @@ model ProductGroup {
 model Address {
   id             Int     @id @default(autoincrement())
   userId         Int     @map("user_id")
+  name           String  @map("name")
   phoneNumber    String  @map("phone_number")
   country        String  @map("country")
   state          String  @map("state")

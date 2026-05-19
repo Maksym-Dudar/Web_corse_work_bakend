@@ -21,13 +21,12 @@ export class PaymentService {
     if (amount <= 0) {
       throw new BadRequestException("Order total must be greater than 0");
     }
-
-    return this.stripeService.createPaymentIntent({
-      amount,
-      currency: "usd",
-      metadata: {
-        orderId: String(order.id),
-      },
-    });
+return this.stripeService.createPaymentIntent({
+			amount: Number(order.total) * 100,
+			currency: "usd",
+			metadata: {
+				orderId: order.id,
+			},
+		});
   }
 }

@@ -42,12 +42,7 @@ export class ProductController {
 
   @Get("search")
   findManySearch(@Query() query: FindManySearchDto) {
-    const search = query.word ?? query.world;
-    if (!search) {
-      throw new BadRequestException("Search query is required");
-    }
-
-    return this.productService.findManySearch(search);
+    return this.productService.findManySearch(query.search);
   }
 
   @Get("bag")

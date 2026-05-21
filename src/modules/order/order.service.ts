@@ -5,6 +5,24 @@ import { ProductRepository } from "../product/product.repository";
 
 const toCents = (amount: number) => Math.round(amount * 100);
 
+const RAW_IMAGE_BASE_URL =
+  process.env.IMAGE_BASE_URL ?? "https://localhost:4200";
+const IMAGE_BASE_URL = RAW_IMAGE_BASE_URL.endsWith("/")
+  ? RAW_IMAGE_BASE_URL.slice(0, -1)
+  : RAW_IMAGE_BASE_URL;
+
+const buildImageUrl = (imagePath?: string | null) => {
+  if (!imagePath) {
+    return null;
+  }
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    return imagePath;
+  }
+  return imagePath[0] === "/"
+    ? `${IMAGE_BASE_URL}${imagePath}`
+    : `${IMAGE_BASE_URL}/${imagePath}`;
+};
+
 @Injectable()
 export class OrderService {
   constructor(

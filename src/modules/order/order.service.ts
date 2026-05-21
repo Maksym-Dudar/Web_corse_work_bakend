@@ -99,7 +99,7 @@ export class OrderService {
       title: product.productGroup?.title ?? null,
       price: product.price,
       quantity,
-      image: product.image?.[1] ?? product.image?.[0] ?? null,
+      image: buildImageUrl(product.image?.[0]) ?? buildImageUrl(product.image?.[1]) ?? null,
     }));
 
     return {
